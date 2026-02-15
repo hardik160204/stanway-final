@@ -1,106 +1,82 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Search, ShoppingBag, User, Menu, X } from 'lucide-react';
-import { useCart } from '../../context/CartContext'; // Ensure this path is correct
+import { ShoppingBag, Search, Menu, X, User } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { toggleCart, totalItems } = useCart();
 
   return (
-    <>
-      {/* HEADER: Always White, Always Fixed, Always Clean */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-white shadow-sm border-b border-gray-100 h-16 md:h-20 flex items-center transition-all duration-300">
+    <nav className="fixed top-0 left-0 right-0 bg-white z-50 border-b border-gray-100">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         
-        <div className="container mx-auto px-4 md:px-6 flex items-center justify-between h-full">
-          
-          {/* 1. LEFT: Mobile Menu + Logo */}
-          <div className="flex items-center gap-2 md:gap-0">
-            {/* Mobile Menu Button (Hamburger) */}
-            <button 
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-full"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
+        {/* 1. Mobile Menu Button (Left) */}
+        <button 
+          className="md:hidden p-2 -ml-2 text-gray-600"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
 
-            {/* Logo */}
-            <Link href="/" className="cursor-pointer flex items-center">
-              <img 
-                src="/stanw-infi.svg" 
-                alt="Stanway Health" 
-                className="h-8 md:h-10 w-auto object-contain"
-              />
-            </Link>
-          </div>
+        {/* 2. THE LOGO (Center on Mobile, Left on Desktop) */}
+        <Link href="/" className="flex-shrink-0">
+          <img 
+            src="/stanw-infi.svg" 
+            alt="Stanway Health" 
+            className="h-8 md:h-12 w-auto object-contain mix-blend-multiply" 
+          />
+        </Link>
 
-          {/* 2. CENTER: Desktop Navigation (Hidden on Mobile) */}
-          <nav className="hidden md:flex gap-8 font-medium text-sm text-gray-700">
-            <Link href="/shop" className="hover:text-red-600 transition-colors">Shop All</Link>
-            <Link href="/shop?collection=bestsellers" className="hover:text-red-600 transition-colors">Best Sellers</Link>
-            <Link href="/about" className="hover:text-red-600 transition-colors">Our Science</Link>
-          </nav>
-
-          {/* 3. RIGHT: Icons (Search, Profile, Cart) */}
-          <div className="flex items-center gap-3 md:gap-6">
-            <button className="p-2 text-gray-700 hover:text-red-600 transition-colors">
-              <Search className="w-5 h-5" />
-            </button>
-            
-            <Link href="/account" className="hidden md:block p-2 text-gray-700 hover:text-red-600 transition-colors">
-              <User className="w-5 h-5" />
-            </Link>
-
-            {/* Cart Icon with Counter Badge */}
-            <button 
-              onClick={() => toggleCart()} 
-              className="relative p-2 text-gray-700 hover:text-red-600 transition-colors"
-            >
-              <ShoppingBag className="w-5 h-5" />
-              {totalItems > 0 && (
-                <span className="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
-                  {totalItems}
-                </span>
-              )}
-            </button>
-          </div>
-
+        {/* 3. Desktop Navigation Links (Hidden on Mobile) */}
+        <div className="hidden md:flex items-center gap-8">
+          <Link href="/shop" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">Shop All</Link>
+          <Link href="/shop?category=best-sellers" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">Best Sellers</Link>
+          <Link href="/science" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">Our Science</Link>
+          <Link href="/about" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">About Us</Link>
         </div>
-      </header>
 
-      {/* 4. MOBILE MENU DRAWER (Slide-in from Left) */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[60] flex md:hidden">
-          {/* Black Overlay */}
-          <div 
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setIsMobileMenuOpen(false)}
-          ></div>
+        {/* 4. Right Icons (Search, User, Cart) */}
+        <div className="flex items-center gap-1 md:gap-4 -mr-2">
           
-          {/* White Menu Panel */}
-          <div className="relative w-[80%] max-w-[300px] h-full bg-white shadow-2xl p-6 flex flex-col">
-            <button 
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="absolute top-4 right-4 p-2 text-gray-500 hover:text-red-600"
-            >
-              <X className="w-6 h-6" />
-            </button>
+          <button className="p-2 text-gray-600 hover:text-black transition-colors">
+            <Search size={20} />
+          </button>
+          
+          {/* USER ACCOUNT ICON - Now visible on mobile! */}
+          <Link href="/account" className="p-2 text-gray-600 hover:text-black transition-colors">
+            <User size={20} />
+          </Link>
 
-            <div className="mt-8 flex flex-col gap-6 text-lg font-medium text-gray-800">
-              <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-              <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)}>Shop All</Link>
-              <Link href="/shop?collection=bestsellers" onClick={() => setIsMobileMenuOpen(false)}>Best Sellers</Link>
-              <Link href="/about" onClick={() => setIsMobileMenuOpen(false)}>Our Science</Link>
-              <hr className="border-gray-100" />
-              <Link href="/account" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 text-gray-500">
-                <User className="w-5 h-5" /> My Account
-              </Link>
-            </div>
-          </div>
+          {/* CART ICON */}
+          <button 
+            onClick={toggleCart}
+            className="p-2 text-gray-600 hover:text-black transition-colors relative"
+          >
+            <ShoppingBag size={20} />
+            {totalItems > 0 && (
+              <span className="absolute top-0 right-0 bg-black text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </button>
+        </div>
+
+      </div>
+
+      {/* Mobile Menu Dropdown */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-white border-t border-gray-100 absolute w-full left-0 top-16 shadow-xl py-4 px-4 flex flex-col gap-4 animate-in slide-in-from-top-5">
+          <Link href="/shop" className="text-lg font-medium text-gray-800 py-2 border-b border-gray-50" onClick={() => setIsMobileMenuOpen(false)}>Shop All</Link>
+          <Link href="/science" className="text-lg font-medium text-gray-800 py-2 border-b border-gray-50" onClick={() => setIsMobileMenuOpen(false)}>Our Science</Link>
+          <Link href="/about" className="text-lg font-medium text-gray-800 py-2 border-b border-gray-50" onClick={() => setIsMobileMenuOpen(false)}>About Us</Link>
+          <Link href="/account" className="text-lg font-medium text-gray-800 py-2 flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
+            <User size={20} /> My Account
+          </Link>
         </div>
       )}
-    </>
+    </nav>
   );
 }
