@@ -6,6 +6,7 @@ import ScienceSection from '../components/homepage/ScienceEducation'; // <--- IM
 import Footer from '../components/layout/Footer';
 import BlogSection from '../components/homepage/BlogSection';
 import Reviews from '../components/homepage/Reviews';
+import OfferBanner from '../components/homepage/OfferBanner';
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
         <ShopByConcern />
         <ScienceSection />  {/* <--- ADD THIS HERE */}
         <BestSellers />
+        <OfferBanner />
         <Reviews /> 
         <BlogSection />   {/* 5. The Blog Grid */}
       </div>
