@@ -1,30 +1,37 @@
-import Header from '../components/layout/Header';
-import Hero from '../components/homepage/Hero';
-import ShopByConcern from '../components/homepage/ShopByConcern';
-import ScienceEducation from '../components/homepage/ScienceEducation';
-import BestSellers from '../components/homepage/BestSellers';
-import Reviews from '../components/homepage/Reviews';
-import WhyStanway from '../components/homepage/WhyStanway';
-// 1. Import the new section
-import BlogSection from '../components/homepage/BlogSection'; 
-import Footer from '../components/layout/Footer';
+import Navbar from '../components/layout/Header';
 import PromoBanner from '../components/homepage/PromoBanner';
+import ShopByConcern from '../components/homepage/ShopByConcern';
+import BestSellers from '../components/homepage/BestSellers';
+import Footer from '../components/layout/Footer';
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-white">
-      <Header />
-      <Hero />
-      <ShopByConcern />
-      <ScienceEducation />
-      <BestSellers />
-      <Reviews />
-      <PromoBanner />
       
-      {/* 2. Add it here, right above the Footer */}
-      <BlogSection />
-      
+      {/* 1. The Fixed Navbar */}
+      <Navbar />
+
+      {/* 2. Main Content Wrapper 
+          CRITICAL: 'pt-16' adds 64px of space at the top.
+          This ensures your Hero Image starts EXACTLY below the Navbar,
+          not behind it.
+      */}
+      <div className="pt-16">
+        
+        {/* The Full Hero (Mobile/Desktop Images) */}
+        <PromoBanner />
+        
+        {/* The Category Circles */}
+        <ShopByConcern />
+        
+        {/* The Product List */}
+        <BestSellers />
+        
+      </div>
+
+      {/* 3. The Footer */}
       <Footer />
+      
     </main>
   );
 }

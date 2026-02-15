@@ -5,21 +5,30 @@ import Link from 'next/link';
 
 export default function PromoBanner() {
   return (
-    // "pt-16" pushes it down so it doesn't hide behind the navbar
-    <section className="w-full pt-16 bg-white">
-      
+    <section className="w-full bg-white">
       <Link href="/shop" className="block w-full">
-        {/* This is the "Magic" line: 
-           w-full = Take full width of phone
-           h-auto = Calculate height automatically (NO DISTORTION)
-        */}
-        <img 
-          src="/hero-bundle.png" 
-          alt="Banner" 
-          className="w-full h-auto object-contain"
-        />
-      </Link>
+        
+        {/* --- MOBILE VERSION (Visible on Phones Only) --- */}
+        {/* Make sure this image is TALL (e.g., 1080x1350) */}
+        <div className="block md:hidden w-full">
+          <img 
+            src="/mobile-banner.jpg" 
+            alt="Stanway Health Mobile" 
+            className="w-full h-auto object-cover"
+          />
+        </div>
 
+        {/* --- DESKTOP VERSION (Visible on Laptops Only) --- */}
+        {/* Make sure this image is WIDE (e.g., 1920x600) */}
+        <div className="hidden md:block w-full">
+          <img 
+            src="/desktop-banner.jpg" 
+            alt="Stanway Health Desktop" 
+            className="w-full h-auto object-cover"
+          />
+        </div>
+
+      </Link>
     </section>
   );
 }
