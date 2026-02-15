@@ -22,7 +22,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
   const [isScienceMode, setIsScienceMode] = useState(false);
   
   // 2. GET THE OPEN FUNCTION
-  const { openCart } = useCart();
+  const { toggleCart } = useCart();
 
   return (
     <div className="relative w-[280px] md:w-[320px] h-[420px] bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 flex-shrink-0 snap-center group">
@@ -97,7 +97,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
           
           {/* 3. ATTACH THE OPEN CART EVENT HERE */}
           <button 
-            onClick={openCart} 
+           onClick={() => toggleCart()}
             className="h-10 w-10 md:w-auto md:px-4 bg-black text-white rounded-full flex items-center justify-center gap-2 hover:bg-gray-800 transition-all active:scale-95 shadow-md"
           >
             <ShoppingBag className="w-4 h-4" />
