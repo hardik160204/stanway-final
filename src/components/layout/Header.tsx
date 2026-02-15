@@ -26,7 +26,8 @@ export default function Navbar() {
           <img 
             src="/stanw-infi.svg" 
             alt="Stanway Health" 
-            className="h-8 md:h-12 w-auto object-contain mix-blend-multiply" 
+            // FIXED: Added max-w-[120px] on mobile to prevent it from pushing icons off screen
+            className="h-8 md:h-12 w-auto max-w-[120px] md:max-w-none object-contain mix-blend-multiply" 
           />
         </Link>
 
@@ -38,19 +39,20 @@ export default function Navbar() {
           <Link href="/about" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">About Us</Link>
         </div>
 
-        {/* 4. Right Icons (Search, User, Cart) */}
+        {/* 4. Right Icons */}
         <div className="flex items-center gap-1 md:gap-4 -mr-2">
           
-          <button className="p-2 text-gray-600 hover:text-black transition-colors">
+          {/* SEARCH: Hidden on Mobile to make room for Account */}
+          <button className="hidden md:block p-2 text-gray-600 hover:text-black transition-colors">
             <Search size={20} />
           </button>
           
-          {/* USER ACCOUNT ICON - Now visible on mobile! */}
-          <Link href="/account" className="p-2 text-gray-600 hover:text-black transition-colors">
+          {/* ACCOUNT: Visible on ALL screens now */}
+          <Link href="/account" className="block p-2 text-gray-600 hover:text-black transition-colors">
             <User size={20} />
           </Link>
 
-          {/* CART ICON */}
+          {/* CART: Always Visible */}
           <button 
             onClick={toggleCart}
             className="p-2 text-gray-600 hover:text-black transition-colors relative"
