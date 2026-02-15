@@ -5,28 +5,26 @@ import Link from 'next/link';
 
 export default function OfferBanner() {
   return (
-    <section className="w-full bg-white py-8 md:py-16">
+    <section className="w-full bg-white py-8">
       <div className="container mx-auto px-4">
         
-        <Link href="/shop" className="block w-full overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+        <Link href="/shop" className="block w-full overflow-hidden rounded-2xl shadow-sm hover:shadow-md transition-shadow">
           
-          {/* === MOBILE OFFER (Phone) === */}
-          {/* Visible on screens smaller than 768px */}
-          <div className="block md:hidden w-full relative">
+          {/* === MOBILE OFFER === */}
+          <div className="block md:hidden w-full">
             <img 
-              src="/offer-mobile.jpg" 
+              src="/offer-mobile.png" 
               alt="Special Offer" 
-              className="w-full h-auto object-cover"
+              className="w-full h-auto object-cover block"
             />
           </div>
 
-          {/* === DESKTOP OFFER (Laptop) === */}
-          {/* Visible on screens larger than 768px */}
-          <div className="hidden md:block w-full relative">
+          {/* === DESKTOP OFFER === */}
+          <div className="hidden md:block w-full">
             <img 
-              src="/offer-desktop.jpg" 
+              src="/offer-desktop.png" 
               alt="Special Offer" 
-              className="w-full h-auto object-cover"
+              className="w-full h-auto object-cover block"
             />
           </div>
 
