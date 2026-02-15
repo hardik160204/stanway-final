@@ -5,26 +5,26 @@ import Link from 'next/link';
 
 export default function PromoBanner() {
   return (
-    <section className="w-full bg-white">
+    <section className="w-full bg-gray-50 border-b border-gray-200">
       <Link href="/shop" className="block w-full">
         
-        {/* --- MOBILE VERSION (Visible on Phones Only) --- */}
-        {/* Make sure this image is TALL (e.g., 1080x1350) */}
-        <div className="block md:hidden w-full">
+        {/* === MOBILE HERO (Phone) === */}
+        <div className="block md:hidden w-full relative min-h-[400px]">
           <img 
-            src="/mobile-banner.jpg" 
-            alt="Stanway Health Mobile" 
+            src="/hero-mobile.jpg" 
+            alt="Stanway Mobile Hero" 
             className="w-full h-auto object-cover"
+            // REMOVED priority="true" (This was causing the error)
           />
         </div>
 
-        {/* --- DESKTOP VERSION (Visible on Laptops Only) --- */}
-        {/* Make sure this image is WIDE (e.g., 1920x600) */}
-        <div className="hidden md:block w-full">
+        {/* === DESKTOP HERO (Laptop) === */}
+        <div className="hidden md:block w-full relative min-h-[500px]">
           <img 
-            src="/desktop-banner.jpg" 
-            alt="Stanway Health Desktop" 
+            src="/hero-desktop.jpg" 
+            alt="Stanway Desktop Hero" 
             className="w-full h-auto object-cover"
+             // REMOVED priority="true"
           />
         </div>
 
