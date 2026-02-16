@@ -124,7 +124,7 @@ export default async function Home() {
   const trendingProducts = await getShopifyProducts();
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white pt-24 md:pt-28">
       <Header />
       <PromoBanner />
       <Hero />
