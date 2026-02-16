@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ShoppingBag, Search, Menu, X, User } from 'lucide-react';
-import { useCart } from '../../context/CartContext';
+import { Search, Menu, X, User } from 'lucide-react';
+// We don't need useCart here anymore because CartSidebar handles it internally
+import CartSidebar from '../cart/CartSidebar';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { toggleCart, totalItems } = useCart();
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white z-50 border-b border-gray-100">
@@ -21,17 +21,16 @@ export default function Navbar() {
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
-        {/* 2. THE LOGO (Center on Mobile, Left on Desktop) */}
+        {/* 2. THE LOGO */}
         <Link href="/" className="flex-shrink-0">
           <img 
             src="/stanw-infi.svg" 
             alt="Stanway Health" 
-            // FIXED: Added max-w-[120px] on mobile to prevent it from pushing icons off screen
             className="h-8 md:h-12 w-auto max-w-[120px] md:max-w-none object-contain mix-blend-multiply" 
           />
         </Link>
 
-        {/* 3. Desktop Navigation Links (Hidden on Mobile) */}
+        {/* 3. Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-8">
           <Link href="/shop" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">Shop All</Link>
           <Link href="/shop?category=best-sellers" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">Best Sellers</Link>
@@ -42,28 +41,19 @@ export default function Navbar() {
         {/* 4. Right Icons */}
         <div className="flex items-center gap-1 md:gap-4 -mr-2">
           
-          {/* SEARCH: Hidden on Mobile to make room for Account */}
+          {/* SEARCH */}
           <button className="hidden md:block p-2 text-gray-600 hover:text-black transition-colors">
             <Search size={20} />
           </button>
           
-          {/* ACCOUNT: Visible on ALL screens now */}
+          {/* ACCOUNT */}
           <Link href="/account" className="block p-2 text-gray-600 hover:text-black transition-colors">
             <User size={20} />
           </Link>
 
-          {/* CART: Always Visible */}
-          <button 
-            onClick={toggleCart}
-            className="p-2 text-gray-600 hover:text-black transition-colors relative"
-          >
-            <ShoppingBag size={20} />
-            {totalItems > 0 && (
-              <span className="absolute top-0 right-0 bg-black text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                {totalItems}
-              </span>
-            )}
-          </button>
+          {/* CART SIDEBAR (Replaces the old button) */}
+          <CartSidebar />
+          
         </div>
 
       </div>
