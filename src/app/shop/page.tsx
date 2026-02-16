@@ -1,121 +1,116 @@
-'use client';
-
-import React, { use } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { Star, ShoppingBag } from 'lucide-react';
+// Adjusting imports to go up two levels (../../) because we are in /app/shop/
 import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
-import { products } from '../../data/products';
-import { useCart } from '../../context/CartContext';
 
-// Next.js 15: searchParams is now a Promise
-export default function ShopPage({ searchParams }: { searchParams: Promise<{ collection?: string }> }) {
-  
-  // 1. Unwrap the params to see if we clicked "Best Sellers"
-  // We use a try/catch or simple check because sometimes searchParams might be undefined in strict mode
-  const params = use(searchParams);
-  const isBestSellers = params?.collection === 'bestsellers';
+// --- 1. SHOPIFY FETCH FUNCTION (Get 20 Products) ---
+async function getAllProducts() {
+  const domain = process.env.NEXT_PUBLIC_SHOPIFY_DOMAIN;
+  const token = process.env.NEXT_PUBLIC_SHOPIFY_ACCESS_TOKEN;
+  const URL = `https://${domain}/api/2023-01/graphql.json`;
 
-  const { addToCart } = useCart();
+  const query = `
+  {
+    products(first: 20) {
+      edges {
+        node {
+          id
+          title
+          handle
+          priceRange {
+            minVariantPrice {
+              amount
+            }
+          }
+          images(first: 1) {
+            edges {
+              node {
+                url
+                altText
+              }
+            }
+          }
+        }
+      }
+    }
+  }`;
 
-  // 2. Filter Logic: If Best Sellers, only show items with Rating >= 4.7
-  const displayProducts = isBestSellers 
-    ? products.filter((p) => p.rating >= 4.7) 
-    : products;
+  const options = {
+    method: "POST",
+    headers: {
+      "X-Shopify-Storefront-Access-Token": token!,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query }),
+    cache: 'no-store' as RequestCache,
+  };
 
-  const pageTitle = isBestSellers ? "Best Sellers" : "All Products";
-  const pageSubtitle = isBestSellers 
-    ? "Our most loved, top-rated formulations." 
-    : "Science-backed formulations for your specific health goals.";
+  try {
+    const res = await fetch(URL, options);
+    const data = await res.json();
+    return data.data?.products?.edges || [];
+  } catch (error) {
+    console.error("Shopify Shop Error:", error);
+    return [];
+  }
+}
+
+// --- 2. SHOP PAGE COMPONENT ---
+export default async function ShopPage() {
+  const products = await getAllProducts();
 
   return (
-    <main className="bg-white min-h-screen">
+    <main className="min-h-screen bg-white">
       <Header />
 
-      {/* Page Header */}
-      <div className="bg-gray-50 pt-32 pb-12 md:pt-40 md:pb-20">
-        <div className="container mx-auto px-4 md:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-            {pageTitle}
-          </h1>
-          <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-            {pageSubtitle}
-          </p>
-        </div>
+      {/* Page Title */}
+      <div className="bg-gray-50 py-12 md:py-20 text-center border-b border-gray-100">
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">All Products</h1>
+        <p className="text-gray-500 max-w-2xl mx-auto px-4">
+          Browse our full range of science-backed supplements designed for your daily health.
+        </p>
       </div>
 
       {/* Product Grid */}
-      <section className="py-16">
-        <div className="container mx-auto px-4 md:px-8">
-          
-          {/* Empty State Check */}
-          {displayProducts.length === 0 ? (
-            <div className="text-center py-20">
-              <h3 className="text-xl font-bold text-gray-900">No products found.</h3>
-              <Link href="/shop" className="text-red-600 underline mt-2 inline-block">View all products</Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
-              {displayProducts.map((product) => (
-                <div key={product.id} className="group flex flex-col">
-                  
-                  <Link href={`/products/${product.slug}`} className="block relative aspect-[4/5] bg-gray-100 rounded-2xl overflow-hidden mb-4">
+      <div className="container mx-auto px-4 py-16">
+        {products.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
+            {products.map((item: any) => {
+              const product = item.node;
+              // Handle image URL safely
+              const image = product.images?.edges?.[0]?.node?.url || 
+                            product.images?.edges?.[0]?.node?.transformedSrc || 
+                            '/placeholder.jpg';
+              
+              const price = product.priceRange.minVariantPrice.amount;
+
+              return (
+                <Link key={product.id} href={`/products/${product.handle}`} className="group block">
+                  <div className="bg-gray-100 rounded-xl overflow-hidden mb-4 relative aspect-square border border-gray-100">
                     <img 
-                      src={product.image} 
-                      alt={product.title}
-                      className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
+                      src={image} 
+                      alt={product.title} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    
-                    {/* Quick Add Button */}
-                    <button 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        addToCart({
-                          id: product.id,
-                          title: product.title,
-                          price: product.price,
-                          image: product.image,
-                          quantity: 1
-                        });
-                      }}
-                      className="absolute bottom-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:bg-black hover:text-white"
-                    >
-                      <ShoppingBag className="w-4 h-4" />
-                    </button>
-                  </Link>
-
-                  {/* Info */}
-                  <div>
-                    <div className="flex items-center gap-1 mb-2">
-                      <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                      <span className="text-xs font-bold text-gray-500">{product.rating}</span>
-                      <span className="text-xs text-gray-400">({product.reviews})</span>
-                    </div>
-                    
-                    <Link href={`/products/${product.slug}`}>
-                      <h3 className="font-bold text-gray-900 text-lg leading-tight mb-2 hover:text-red-600 transition-colors">
-                        {product.title}
-                      </h3>
-                    </Link>
-                    
-                    <div className="flex items-center gap-3">
-                      <span className="font-bold text-gray-900">₹{product.price}</span>
-                      <span className="text-sm text-gray-400 line-through">₹{product.originalPrice}</span>
-                      {product.originalPrice > product.price && (
-                        <span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded">
-                          {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
-                        </span>
-                      )}
-                    </div>
                   </div>
-
-                </div>
-              ))}
-            </div>
-          )}
-
-        </div>
-      </section>
+                  <h3 className="font-bold text-gray-900 text-sm md:text-base mb-1">
+                    {product.title}
+                  </h3>
+                  <p className="text-gray-600 font-medium">
+                    ₹{parseFloat(price).toFixed(2)}
+                  </p>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-20">
+            <h2 className="text-xl font-bold text-gray-400">No products found.</h2>
+            <p className="text-gray-400 text-sm mt-2">Check your Shopify Inventory.</p>
+          </div>
+        )}
+      </div>
 
       <Footer />
     </main>
