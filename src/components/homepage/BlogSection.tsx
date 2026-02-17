@@ -1,53 +1,99 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
-import { blogs } from '../../data/blogs';
 
-export default function BlogSection() {
-  const featuredBlogs = blogs.slice(0, 3);
-  const largeBlog = featuredBlogs[0];
-  const smallBlogs = featuredBlogs.slice(1);
+// --- SHOPIFY FETCH FUNCTION ---
+async function getBlogs() {
+  const domain = process.env.NEXT_PUBLIC_SHOPIFY_DOMAIN;
+  const token = process.env.NEXT_PUBLIC_SHOPIFY_ACCESS_TOKEN;
+  const URL = `https://${domain}/api/2023-01/graphql.json`;
+
+  const query = `
+  {
+    articles(first: 3, sortKey: PUBLISHED_AT, reverse: true) {
+      edges {
+        node {
+          id
+          title
+          excerpt
+          handle
+          publishedAt
+          image {
+            url
+            altText
+          }
+          blog {
+            handle
+          }
+        }
+      }
+    }
+  }
+  `;
+
+  const options = {
+    method: "POST",
+    headers: {
+      "X-Shopify-Storefront-Access-Token": token!,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query }),
+    cache: 'no-store' as RequestCache,
+  };
+
+  try {
+    const res = await fetch(URL, options);
+    const data = await res.json();
+    return data.data?.articles?.edges || [];
+  } catch (error) {
+    console.error("Blog Fetch Error:", error);
+    return [];
+  }
+}
+
+export default async function BlogSection() {
+  const articles = await getBlogs();
+
+  if (articles.length === 0) return null;
 
   return (
-    <section className="py-16 md:py-24 bg-white border-b border-gray-100">
-      <div className="container mx-auto px-4 md:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">Blogs</h2>
+    <section className="py-20 bg-white">
+      <div className="container mx-auto px-4">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
+          Latest from Stanway
+        </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Large Blog Card */}
-          <Link href={`/blog/${largeBlog.slug}`} className="md:col-span-2 relative h-[300px] md:h-[500px] rounded-3xl overflow-hidden group block">
-            {/* STANDARD HTML IMG TAG - Works with any URL instantly */}
-            <img
-              src={largeBlog.image}
-              alt={largeBlog.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-            <div className="absolute bottom-0 left-0 p-6 md:p-10">
-              <span className="text-white/80 text-sm md:text-base mb-3 block font-medium">{largeBlog.readTime} | {largeBlog.category}</span>
-              <h3 className="text-2xl md:text-4xl font-bold text-white leading-tight">{largeBlog.title}</h3>
-            </div>
-          </Link>
-
-          {/* Small Blog Cards */}
-          <div className="flex flex-col gap-6">
-            {smallBlogs.map((blog) => (
-              <Link key={blog.id} href={`/blog/${blog.slug}`} className="relative h-[240px] rounded-3xl overflow-hidden group block">
-                <img
-                  src={blog.image}
-                  alt={blog.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-6">
-                  <span className="text-white/80 text-xs md:text-sm mb-2 block font-medium">{blog.readTime} | {blog.category}</span>
-                  <h3 className="text-xl font-bold text-white leading-tight">{blog.title}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {articles.map((item: any) => {
+            const article = item.node;
+            return (
+              <div key={article.id} className="group cursor-pointer">
+                <div className="overflow-hidden rounded-2xl mb-4 aspect-[4/3] bg-gray-100">
+                  {article.image && (
+                    <img 
+                      src={article.image.url} 
+                      alt={article.image.altText || article.title} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                    />
+                  )}
                 </div>
-              </Link>
-            ))}
-          </div>
+                <p className="text-sm text-gray-500 mb-2">
+                  {new Date(article.publishedAt).toLocaleDateString()}
+                </p>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-gray-600 transition">
+                  {article.title}
+                </h3>
+                <p className="text-gray-600 line-clamp-2 mb-4">
+                  {article.excerpt || "Read more about this topic..."}
+                </p>
+                <Link 
+                  href={`/blogs/${article.blog.handle}/${article.handle}`} // Note: You'll need to create this page later if you want full articles
+                  className="text-black font-bold underline hover:text-gray-600"
+                >
+                  Read Article
+                </Link>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

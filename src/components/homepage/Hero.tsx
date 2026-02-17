@@ -12,7 +12,7 @@ export default function PromoBanner() {
         <div className="block md:hidden">
           <img 
             src="/hero-mobile.jpg" 
-            alt="Stanway Hero Mobile" 
+            alt="" 
             className="w-full h-auto object-cover"
           />
         </div>
@@ -21,7 +21,7 @@ export default function PromoBanner() {
         <div className="hidden md:block">
           <img 
             src="/hero-desktop.jpg" 
-            alt="Stanway Hero Desktop" 
+            alt="" 
             className="w-full h-auto object-cover"
           />
         </div>
