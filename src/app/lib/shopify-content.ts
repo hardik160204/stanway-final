@@ -5,7 +5,7 @@ export async function getHomepageConfig() {
 
   const query = `
   {
-    metaobject(handle: {handle: "global-settings", type: "homepage_config"}) {
+    metaobject(handle: {handle: "stanway-settings", type: "homepage_config"}) {
       fields {
         key
         value
