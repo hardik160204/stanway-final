@@ -117,6 +117,7 @@ async function getShopifyProducts() {
     return FALLBACK_PRODUCTS; // Safety net
   }
 }
+<h1 className="text-7xl bg-red-600 text-white text-center py-10">TESTING NEW CODE</h1>
 
 // --- MAIN PAGE LAYOUT ---
 export default async function Home() {

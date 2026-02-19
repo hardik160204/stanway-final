@@ -1,3 +1,4 @@
+// 1. Fetches Homepage Banners and Links
 export async function getHomepageConfig() {
   const domain = process.env.NEXT_PUBLIC_SHOPIFY_DOMAIN;
   const token = process.env.NEXT_PUBLIC_SHOPIFY_ACCESS_TOKEN;
@@ -65,7 +66,6 @@ export async function getHomepageConfig() {
       // Links
       else if (f.key === "promo_links" && f.value) {
         try {
-          // Shopify sends a "List of values" as a stringified JSON array
           promoLinks = JSON.parse(f.value); 
         } catch (e) {
           promoLinks = [];
@@ -86,6 +86,98 @@ export async function getHomepageConfig() {
 
   } catch (error) {
     console.error("Metaobject Error:", error);
+    return null;
+  }
+}
+
+// 2. Fetches the 3 newest articles for the Homepage feed
+export async function getLatestArticles() {
+  const domain = process.env.NEXT_PUBLIC_SHOPIFY_DOMAIN;
+  const token = process.env.NEXT_PUBLIC_SHOPIFY_ACCESS_TOKEN;
+  const URL = `https://${domain}/api/2024-01/graphql.json`;
+
+  const query = `
+  {
+    blog(handle: "news") {
+      articles(first: 3, sortKey: PUBLISHED_AT, reverse: true) {
+        edges {
+          node {
+            id
+            title
+            handle
+            excerptHtml
+            publishedAt
+            image {
+              url
+              altText
+            }
+          }
+        }
+      }
+    }
+  }
+  `;
+
+  try {
+    const res = await fetch(URL, {
+      method: "POST",
+      headers: {
+        "X-Shopify-Storefront-Access-Token": token!,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ query }),
+      cache: 'no-store',
+    });
+    
+    const data = await res.json();
+    return data.data?.blog?.articles?.edges.map((edge: any) => edge.node) || [];
+  } catch (error) {
+    console.error("Error fetching latest articles:", error);
+    return [];
+  }
+}
+
+// 3. Fetches a single article based on the URL clicked
+export async function getSingleArticle(handle: string) {
+  const domain = process.env.NEXT_PUBLIC_SHOPIFY_DOMAIN;
+  const token = process.env.NEXT_PUBLIC_SHOPIFY_ACCESS_TOKEN;
+  const URL = `https://${domain}/api/2024-01/graphql.json`;
+
+  const query = `
+  {
+    blog(handle: "news") {
+      articleByHandle(handle: "${handle}") {
+        title
+        publishedAt
+        contentHtml
+        image {
+          url
+          altText
+        }
+        authorV2 {
+          name
+        }
+      }
+    }
+  }
+  `;
+
+  try {
+    const res = await fetch(URL, {
+      method: "POST",
+      headers: {
+        "X-Shopify-Storefront-Access-Token": token!,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ query }),
+      cache: 'no-store',
+    });
+    
+    const data = await res.json();
+    return data.data?.blog?.articleByHandle || null;
+
+  } catch (error) {
+    console.error("Error fetching single article:", error);
     return null;
   }
 }

@@ -10,7 +10,7 @@ const reviews = [
     name: "Aditi S.",
     role: "Verified Buyer",
     image: "https://randomuser.me/api/portraits/women/23.jpg",
-    product: "Apple Cider Vinegar",
+    product: "Apple Cider Vinegar Tablets",
     rating: 5,
     text: "I was skeptical about ACV because of the taste, but these effervescents are actually delicious. My bloating has gone down significantly."
   },
@@ -19,7 +19,7 @@ const reviews = [
     name: "Rahul M.",
     role: "Verified Buyer",
     image: "https://randomuser.me/api/portraits/men/32.jpg",
-    product: "Ashwagandha KSM-66",
+    product: "Ashwagandha Tablets",
     rating: 5,
     text: "My sleep quality was terrible due to work stress. This KSM-66 is the real deal. I fall asleep faster and wake up feeling rested."
   },
@@ -28,7 +28,7 @@ const reviews = [
     name: "Sneha K.",
     role: "Verified Buyer",
     image: "https://randomuser.me/api/portraits/women/44.jpg",
-    product: "Marine Collagen",
+    product: "Collagen Tablets",
     rating: 5,
     text: "My skin feels so much plumper. I add this to my morning coffee and it dissolves instantly. Love that it has no weird aftertaste."
   },
@@ -37,7 +37,7 @@ const reviews = [
     name: "Vikram R.",
     role: "Verified Buyer",
     image: "https://randomuser.me/api/portraits/men/86.jpg",
-    product: "Multivitamin for Men",
+    product: "Multivitamin for Men tablets",
     rating: 4,
     text: "A solid daily stack. I used to feel drained by 4 PM, but my energy levels are much more stable now. Good packaging too."
   }

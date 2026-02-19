@@ -1,23 +1,29 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { blogs } from '../../../data/blogs';
+import { getSingleArticle } from '../../lib/shopify-content'; 
 import Header from '../../../components/layout/Header';
 import Footer from '../../../components/layout/Footer';
 import { ArrowLeft } from 'lucide-react';
 
-export async function generateStaticParams() {
-  return blogs.map((blog) => ({
-    slug: blog.slug,
-  }));
-}
+// Notice the type change here: params is now a Promise!
+export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
+  
+  // 1. WE MUST AWAIT THE PARAMS FIRST (Next.js 15/16 requirement)
+  const resolvedParams = await params;
 
-export default function BlogPost({ params }: { params: { slug: string } }) {
-  const blog = blogs.find((b) => b.slug === params.slug);
+  // 2. Now we can safely use the resolved slug to ask Shopify!
+  const article = await getSingleArticle(resolvedParams.slug);
 
-  if (!blog) {
-    notFound();
+  if (!article) {
+    return notFound();
   }
+
+  const dateOptions: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+  const formattedDate = new Date(article.publishedAt).toLocaleDateString('en-US', dateOptions);
+
+  const wordCount = article.contentHtml.replace(/<[^>]*>?/gm, '').split(/\s+/).length;
+  const readTime = Math.ceil(wordCount / 200) + " min read";
 
   return (
     <main className="min-h-screen bg-white">
@@ -30,29 +36,34 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
           </Link>
 
           <header className="text-center mb-10">
-            <span className="text-red-600 font-bold text-sm uppercase tracking-wider">{blog.category}</span>
-            <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 mt-4 mb-6 leading-tight">{blog.title}</h1>
+            <span className="text-red-600 font-bold text-sm uppercase tracking-wider">Wellness</span>
+            
+            <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 mt-4 mb-6 leading-tight">
+              {article.title}
+            </h1>
+            
             <div className="flex items-center justify-center text-gray-500 text-sm gap-4 font-medium">
-              <p>By {blog.author}</p>
+              <p>By {article.authorV2?.name || "Stanway Health"}</p>
               <span>•</span>
-              <p>{blog.date}</p>
+              <p>{formattedDate}</p>
               <span>•</span>
-              <p>{blog.readTime}</p>
+              <p>{readTime}</p>
             </div>
           </header>
 
-          <div className="relative w-full h-[300px] md:h-[450px] rounded-3xl overflow-hidden mb-12 shadow-xl">
-             {/* STANDARD HTML IMG TAG */}
-            <img
-              src={blog.image}
-              alt={blog.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          {article.image && (
+            <div className="relative w-full h-[300px] md:h-[450px] rounded-3xl overflow-hidden mb-12 shadow-xl">
+              <img
+                src={article.image.url}
+                alt={article.image.altText || article.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
 
           <div 
             className="prose prose-lg max-w-none prose-headings:font-bold prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900 prose-a:text-red-600 hover:prose-a:text-red-700"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
+            dangerouslySetInnerHTML={{ __html: article.contentHtml }}
           />
 
         </div>
