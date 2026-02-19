@@ -4,12 +4,31 @@ import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
+// --- UPDATED LINKS ---
+// We changed the "link" properties below to point to dedicated collection pages
 const categories = [
-  { id: 'daily', title: 'DAILY NUTRITION', link: '/shop?collection=daily', bgColor: 'bg-[#EAD6C9]', image: '/cat-daily.jpg' },
-  { id: 'beauty', title: 'SKIN & DETOX', link: '/shop?collection=beauty', bgColor: 'bg-[#A8C6DF]', image: '/cat-beauty.jpg' },
-  { id: 'balance', title: 'METABOLISM', link: '/shop?collection=wellness', bgColor: 'bg-[#F0D879]', image: '/cat-energy.jpg' }
+  { 
+    id: 'daily', 
+    title: 'DAILY NUTRITION', 
+    link: '/collections/daily-nutrition', 
+    bgColor: 'bg-[#EAD6C9]', 
+    image: '/cat-daily.jpg' 
+  },
+  { 
+    id: 'beauty', 
+    title: 'SKIN & DETOX', 
+    link: '/collections/skin-detox', 
+    bgColor: 'bg-[#A8C6DF]', 
+    image: '/cat-beauty.jpg' 
+  },
+  { 
+    id: 'balance', 
+    title: 'METABOLISM', 
+    link: '/collections/metabolism', 
+    bgColor: 'bg-[#F0D879]', 
+    image: '/cat-energy.jpg' 
+  }
 ];
-
 export default function ShopByConcern() {
   return (
     <section className="py-8 md:py-20 bg-white">
