@@ -19,9 +19,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     return notFound();
   }
 
-  const dateOptions: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-  const formattedDate = new Date(article.publishedAt).toLocaleDateString('en-US', dateOptions);
-
   const wordCount = article.contentHtml.replace(/<[^>]*>?/gm, '').split(/\s+/).length;
   const readTime = Math.ceil(wordCount / 200) + " min read";
 
@@ -43,10 +40,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             </h1>
             
             <div className="flex items-center justify-center text-gray-500 text-sm gap-4 font-medium">
-              <p>By {article.authorV2?.name || "Stanway Health"}</p>
-              <span>•</span>
-              <p>{formattedDate}</p>
-              <span>•</span>
               <p>{readTime}</p>
             </div>
           </header>
