@@ -8,30 +8,25 @@ interface Slide {
   id: number;
   mobile: string;
   desktop: string;
+  link: string;
   alt: string;
 }
 
 export default function PromoBanner() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slides, setSlides] = useState<Slide[]>([]);
-  
-  // NEW: State to hold the dynamic link, defaulting to /shop
-  const [targetLink, setTargetLink] = useState("/shop"); 
 
   useEffect(() => {
     async function loadShopifyData() {
       const config = await getHomepageConfig();
-      
-      // NEW: If you typed a link into Shopify, update the state!
-      if (config?.promo_link) {
-        setTargetLink(config.promo_link);
-      }
 
       if (config?.promo_desktop && config.promo_desktop.length > 0) {
         const shopifySlides = config.promo_desktop.map((desktopUrl: string, index: number) => ({
           id: index,
           desktop: desktopUrl,
           mobile: config.promo_mobile[index] || desktopUrl, 
+          // Match the link to the image index. If missing, fallback to "/shop"
+          link: (config.promo_links && config.promo_links[index]) ? config.promo_links[index] : "/shop",
           alt: `Promo Slide ${index + 1}`
         }));
         setSlides(shopifySlides);
@@ -51,11 +46,14 @@ export default function PromoBanner() {
 
   if (slides.length === 0) return null;
 
+  // Get the link for the currently visible slide
+  const currentLink = slides[currentSlide]?.link || "/shop";
+
   return (
     <section className="w-full bg-white relative group">
       
-      {/* UPDATE: The Link now uses our dynamic targetLink variable! */}
-      <Link href={targetLink} className="block w-full">
+      {/* The clickable wrapper around the entire slider */}
+      <Link href={currentLink} className="block w-full">
         <div className="grid grid-cols-1">
           {slides.map((slide, index) => (
             <div 

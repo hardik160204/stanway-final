@@ -38,6 +38,7 @@ export async function getHomepageConfig() {
       body: JSON.stringify({ query }),
       cache: 'no-store',
     });
+    
     const data = await res.json();
     const fields = data.data?.metaobject?.fields || [];
     
@@ -46,24 +47,29 @@ export async function getHomepageConfig() {
     let offerDesktop = "";
     let offerMobile = "";
     
-    // NEW: Default links fall back to /shop if you leave the Shopify box empty
-    let promoLink = "/shop"; 
+    // Arrays and strings for our links
+    let promoLinks: string[] = []; 
     let offerLink = "/shop";
 
     fields.forEach((f: any) => {
       // Images
       if (f.key === "promo_banners" && f.references) {
-        promoDesktop = f.references.edges.map((e: any) => e.node.image.url);
+        promoDesktop = f.references.edges.map((e: any) => e.node.image?.url).filter(Boolean);
       } else if (f.key === "promo_banners_mobile" && f.references) {
-        promoMobile = f.references.edges.map((e: any) => e.node.image.url);
+        promoMobile = f.references.edges.map((e: any) => e.node.image?.url).filter(Boolean);
       } else if (f.key === "offer_image" && f.reference) {
-        offerDesktop = f.reference.image.url;
+        offerDesktop = f.reference.image?.url || "";
       } else if (f.key === "offer_image_mobile_1" && f.reference) {
-        offerMobile = f.reference.image.url;
+        offerMobile = f.reference.image?.url || "";
       } 
-      // NEW: Links (These use f.value because they are text, not images)
-      else if (f.key === "promo_link" && f.value) {
-        promoLink = f.value;
+      // Links
+      else if (f.key === "promo_links" && f.value) {
+        try {
+          // Shopify sends a "List of values" as a stringified JSON array
+          promoLinks = JSON.parse(f.value); 
+        } catch (e) {
+          promoLinks = [];
+        }
       } else if (f.key === "offer_link" && f.value) {
         offerLink = f.value;
       }
@@ -74,8 +80,8 @@ export async function getHomepageConfig() {
       promo_mobile: promoMobile.length > 0 ? promoMobile : promoDesktop,
       offer_desktop: offerDesktop,
       offer_mobile: offerMobile || offerDesktop,
-      promo_link: promoLink, // Exporting the link
-      offer_link: offerLink  // Exporting the link
+      promo_links: promoLinks, 
+      offer_link: offerLink  
     };
 
   } catch (error) {
