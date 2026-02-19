@@ -1,36 +1,40 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
+import { getHomepageConfig } from '../../app/lib/shopify-content';
 
-export default function OfferBanner() {
+export default async function OfferBanner() {
+  const config = await getHomepageConfig();
+
+  // If no desktop image, hide the whole section
+  if (!config?.offer_desktop) return null;
+
+  const desktopImage = config.offer_desktop;
+  // Use mobile image if available, otherwise fallback to desktop
+  const mobileImage = config.offer_mobile || desktopImage;
+
   return (
-    <section className="w-full bg-white py-8">
-      <div className="container mx-auto px-4">
+    <section className="py-12 container mx-auto px-4">
+      <Link href="/shop" className="block relative w-full hover:shadow-xl transition duration-300">
         
-        <Link href="/shop" className="block w-full overflow-hidden rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-          
-          {/* === MOBILE OFFER === */}
-          <div className="block md:hidden w-full">
-            <img 
-              src="/offer-mobile.png" 
-              alt="Special Offer" 
-              className="w-full h-auto object-cover block"
-            />
-          </div>
+        {/* === MOBILE VERSION === */}
+        <div className="block md:hidden">
+          <img 
+            src={mobileImage} 
+            alt="Special Offer" 
+            className="w-full h-auto object-cover rounded-3xl"
+          />
+        </div>
 
-          {/* === DESKTOP OFFER === */}
-          <div className="hidden md:block w-full">
-            <img 
-              src="/offer-desktop.png" 
-              alt="Special Offer" 
-              className="w-full h-auto object-cover block"
-            />
-          </div>
+        {/* === DESKTOP VERSION === */}
+        <div className="hidden md:block">
+          <img 
+            src={desktopImage} 
+            alt="Special Offer" 
+            className="w-full h-auto object-cover rounded-3xl"
+          />
+        </div>
 
-        </Link>
-
-      </div>
+      </Link>
     </section>
   );
 }

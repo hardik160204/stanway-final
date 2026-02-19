@@ -76,9 +76,6 @@ export default async function BlogSection() {
                     />
                   )}
                 </div>
-                <p className="text-sm text-gray-500 mb-2">
-                  {new Date(article.publishedAt).toLocaleDateString()}
-                </p>
                 <h3 className="text-xl font-bold mb-2 group-hover:text-gray-600 transition">
                   {article.title}
                 </h3>
