@@ -14,17 +14,23 @@ interface Slide {
 export default function PromoBanner() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slides, setSlides] = useState<Slide[]>([]);
+  
+  // NEW: State to hold the dynamic link, defaulting to /shop
+  const [targetLink, setTargetLink] = useState("/shop"); 
 
   useEffect(() => {
     async function loadShopifyData() {
       const config = await getHomepageConfig();
       
+      // NEW: If you typed a link into Shopify, update the state!
+      if (config?.promo_link) {
+        setTargetLink(config.promo_link);
+      }
+
       if (config?.promo_desktop && config.promo_desktop.length > 0) {
-        // Zip the two lists together
         const shopifySlides = config.promo_desktop.map((desktopUrl: string, index: number) => ({
           id: index,
           desktop: desktopUrl,
-          // If mobile list is shorter or missing, use desktop url as fallback
           mobile: config.promo_mobile[index] || desktopUrl, 
           alt: `Promo Slide ${index + 1}`
         }));
@@ -47,7 +53,9 @@ export default function PromoBanner() {
 
   return (
     <section className="w-full bg-white relative group">
-      <Link href="/shop" className="block w-full">
+      
+      {/* UPDATE: The Link now uses our dynamic targetLink variable! */}
+      <Link href={targetLink} className="block w-full">
         <div className="grid grid-cols-1">
           {slides.map((slide, index) => (
             <div 

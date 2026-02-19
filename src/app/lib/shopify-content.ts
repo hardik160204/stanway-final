@@ -1,7 +1,7 @@
 export async function getHomepageConfig() {
   const domain = process.env.NEXT_PUBLIC_SHOPIFY_DOMAIN;
   const token = process.env.NEXT_PUBLIC_SHOPIFY_ACCESS_TOKEN;
-  const URL = `https://${domain}/api/2023-01/graphql.json`;
+  const URL = `https://${domain}/api/2024-01/graphql.json`;
 
   const query = `
   {
@@ -13,18 +13,14 @@ export async function getHomepageConfig() {
           edges {
             node {
               ... on MediaImage {
-                image {
-                  url
-                }
+                image { url }
               }
             }
           }
         }
         reference {
           ... on MediaImage {
-            image {
-              url
-            }
+            image { url }
           }
         }
       }
@@ -45,38 +41,41 @@ export async function getHomepageConfig() {
     const data = await res.json();
     const fields = data.data?.metaobject?.fields || [];
     
-    // 1. Initialize empty containers
     let promoDesktop: string[] = [];
     let promoMobile: string[] = [];
     let offerDesktop = "";
     let offerMobile = "";
+    
+    // NEW: Default links fall back to /shop if you leave the Shopify box empty
+    let promoLink = "/shop"; 
+    let offerLink = "/shop";
 
-    // 2. Sort the data into the right containers
     fields.forEach((f: any) => {
-      // Promo Desktop (List)
+      // Images
       if (f.key === "promo_banners" && f.references) {
         promoDesktop = f.references.edges.map((e: any) => e.node.image.url);
-      } 
-      // Promo Mobile (List)
-      else if (f.key === "promo_banners_mobile" && f.references) {
+      } else if (f.key === "promo_banners_mobile" && f.references) {
         promoMobile = f.references.edges.map((e: any) => e.node.image.url);
-      }
-      // Offer Desktop (Single)
-      else if (f.key === "offer_image" && f.reference) {
+      } else if (f.key === "offer_image" && f.reference) {
         offerDesktop = f.reference.image.url;
-      }
-      // Offer Mobile (Single) - Checking for your specific "1" key
-      else if (f.key === "offer_image_mobile_1" && f.reference) {
+      } else if (f.key === "offer_image_mobile_1" && f.reference) {
         offerMobile = f.reference.image.url;
+      } 
+      // NEW: Links (These use f.value because they are text, not images)
+      else if (f.key === "promo_link" && f.value) {
+        promoLink = f.value;
+      } else if (f.key === "offer_link" && f.value) {
+        offerLink = f.value;
       }
     });
 
-    // 3. Return the clean package
     return {
       promo_desktop: promoDesktop,
-      promo_mobile: promoMobile.length > 0 ? promoMobile : promoDesktop, // Fallback if mobile empty
+      promo_mobile: promoMobile.length > 0 ? promoMobile : promoDesktop,
       offer_desktop: offerDesktop,
-      offer_mobile: offerMobile || offerDesktop // Fallback if mobile empty
+      offer_mobile: offerMobile || offerDesktop,
+      promo_link: promoLink, // Exporting the link
+      offer_link: offerLink  // Exporting the link
     };
 
   } catch (error) {
